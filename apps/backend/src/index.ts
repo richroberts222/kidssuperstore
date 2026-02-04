@@ -23,6 +23,17 @@ app.use(
 
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
+// --- Dev helpers (mock-only) ---
+app.get('/dev/outbox', (_req, res) => {
+  const verifications = [...db.usersById.values()]
+    .filter((u) => !u.verified && u.verifyToken)
+    .map((u) => ({
+      email: u.email,
+      verifyUrl: `${env.apiOrigin}/auth/verify?token=${encodeURIComponent(u.verifyToken!)}`,
+    }));
+  return res.json({ verifications });
+});
+
 // --- Auth ---
 app.post('/auth/signup', (req, res) => {
   const parsed = signupSchema.safeParse(req.body);
