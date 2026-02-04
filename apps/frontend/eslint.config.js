@@ -19,5 +19,12 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // This mock app uses loading flags in effects (a common pattern).
+      'react-hooks/set-state-in-effect': 'off',
+
+      // Context + hooks + providers are exported from the same file.
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ])
