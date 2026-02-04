@@ -21,6 +21,29 @@ app.use(
   }),
 );
 
+// Ensure the storefront has items even before any user signs up.
+if (db.productsById.size === 0) {
+  const systemEmail = 'stand@kidssuperstore.local';
+  const existing = db.usersByEmail.get(systemEmail);
+  const systemUserId = existing?.id ?? newId('user');
+
+  if (!existing) {
+    const systemUser = {
+      id: systemUserId,
+      email: systemEmail,
+      displayName: 'Stand Keeper',
+      passwordHash: hashPassword(`system_${nanoid(16)}`),
+      verified: true,
+      createdAt: Date.now(),
+    };
+
+    db.usersByEmail.set(systemEmail, systemUser);
+    db.usersById.set(systemUserId, systemUser);
+  }
+
+  seedProducts(systemUserId);
+}
+
 app.get('/health', (_req, res) => res.json({ ok: true }));
 
 // --- Dev helpers (mock-only) ---
